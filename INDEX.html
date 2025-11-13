@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz and Test App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Quiz and Test App</h1>
+    <div class="tab-buttons">
+      <button id="tabQuestions" class="active">Question Bank</button>
+      <button id="tabTest">Test Mode</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- TAB 1: Question Bank -->
+    <section id="questionBank" class="tab active">
+      <h2>All Questions</h2>
+      <div id="questionList">
+        <!-- Questions will be loaded here from JSON -->
+      </div>
+    </section>
+
+    <!-- TAB 2: Test Mode -->
+    <section id="testMode" class="tab">
+      <h2>Test Mode</h2>
+      <button id="startTest">Start Test (Random 50 Questions)</button>
+      <div id="testArea" class="hidden">
+        <div id="testQuestions"></div>
+        <button id="submitTest" class="hidden">Submit Test</button>
+      </div>
+      <div id="testResult" class="result"></div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
