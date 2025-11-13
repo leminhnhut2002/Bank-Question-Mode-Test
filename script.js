@@ -1,10 +1,7 @@
-/* ================================
-   QUIZ AND TEST SCRIPT
-================================ */
+/* ====== QUIZ AND TEST SCRIPT ====== */
 
-// ======== QUESTIONS JSON (one line each) ========
 const questions = [
-  { question: " UNIT 1 What is the primary role of a freight forwarder?", options: ["To manufacture goods for international trade.", "To act as an intermediary organizing transport and ancillary services.", "To provide financial loans to importers.", "To set international trade laws."], correct: 1 },
+    { question: " UNIT 1 What is the primary role of a freight forwarder?", options: ["To manufacture goods for international trade.", "To act as an intermediary organizing transport and ancillary services.", "To provide financial loans to importers.", "To set international trade laws."], correct: 1 },
 { question: "In trade and forwarding activities, who is the consignor?", options: ["The receiver of the goods.", "The person who purchases the goods.", "The sender of the goods.", "The carrier of the goods."], correct: 2 },
 { question: "Which of the following is NOT a typical service offered by a freight forwarder?", options: ["Customs clearance", "Procuring insurance", "Manufacturing the goods", "Storage and handling"], correct: 2 },
 { question: "According to FIATA model rules, when is a freight forwarder NOT liable for the acts of third parties?", options: ["Always liable for third parties.", "Only when the third party is a subcontractor.", "When it has failed to exercise due diligence in selecting them.", "When the goods are perishable."], correct: 2 },
@@ -532,10 +529,7 @@ const questions = [
 { question: "What do partnerships typically involve selling?", options: ["Goods or services together", "Competing products", "Nothing", "Only services"], correct: 0 },
 { question: "What is the foundation of successful relationship management?", options: ["Clear expectations and regular communication", "Hidden agendas", "Limited interaction", "Secret operations"], correct: 0 }
 
-
-
-
-
+    
 ];
 
 // ======== DOM ELEMENTS ========
@@ -570,87 +564,78 @@ function switchTab(tab){
 // ======== LOAD QUESTION BANK ========
 function loadQuestions(){
   questionList.innerHTML="";
-  if(!questions.length){ 
-    questionList.innerHTML="<p>No questions yet.</p>"; 
-    return;
-  }
+  if(!questions.length){ questionList.innerHTML="<p>No questions yet.</p>"; return; }
   questions.forEach((q,index)=>{
-    const div=document.createElement("div");
-    div.className="question";
-    div.innerHTML=`<h3>Q${index+1}. ${q.question}</h3>`+
-      q.options.map((opt,i)=>`<span class="option" onclick="checkAnswer(this,${i},${q.correct})">${opt}</span>`).join(" ");
+    const div=document.createElement("div"); div.className="question";
+    const h3=document.createElement("h3"); h3.textContent=`Q${index+1}. ${q.question}`;
+    div.appendChild(h3);
+    const optionsDiv=document.createElement("div"); optionsDiv.className="options";
+    q.options.forEach((opt,i)=>{
+      const span=document.createElement("span"); span.className="option"; span.textContent=opt;
+      span.addEventListener("click",()=>checkAnswer(span,i,q.correct));
+      optionsDiv.appendChild(span);
+    });
+    div.appendChild(optionsDiv);
     questionList.appendChild(div);
   });
 }
 
-// ======== CHECK ANSWER (QUESTION BANK TAB) ========
+// ======== CHECK ANSWER ========
 function checkAnswer(el, selected, correct){
-  const options = el.parentNode.querySelectorAll(".option");
+  const options=el.parentNode.querySelectorAll(".option");
   options.forEach(o=>o.classList.remove("correct","wrong"));
-  if(selected===correct){
-    el.classList.add("correct"); // green
-  } else {
-    el.classList.add("wrong");   // red
-    options[correct].classList.add("correct"); // show correct = green
-  }
+  if(selected===correct) el.classList.add("correct");
+  else { el.classList.add("wrong"); options[correct].classList.add("correct"); }
 }
 
 // ======== TEST MODE ========
 startTestBtn.addEventListener("click", startTest);
-let currentTest = [];
-let userAnswers = {};
+let currentTest=[]; let userAnswers={};
 
 function startTest(){
-  if(questions.length < 50){
-    alert("You need at least 50 questions to start the test!");
-    return;
-  }
-  currentTest = getRandomQuestions(questions,50);
+  const numQuestions=Math.min(questions.length,50);
+  currentTest=getRandomQuestions(questions,numQuestions);
   testArea.classList.remove("hidden");
-  testResult.innerHTML="";
-  testQuestionsDiv.innerHTML="";
-  submitTestBtn.classList.remove("hidden");
-  userAnswers={};
+  testResult.innerHTML=""; testQuestionsDiv.innerHTML="";
+  submitTestBtn.classList.remove("hidden"); userAnswers={};
 
   currentTest.forEach((q,index)=>{
-    const div=document.createElement("div");
-    div.className="question";
-    div.innerHTML=`<h3>Q${index+1}. ${q.question}</h3>`+
-      q.options.map((opt,i)=>`<span class="option" data-index="${i}" onclick="selectOption(this,${index})">${opt}</span>`).join(" ");
-    testQuestionsDiv.appendChild(div);
+    const div=document.createElement("div"); div.className="question";
+    const h3=document.createElement("h3"); h3.textContent=`Q${index+1}. ${q.question}`;
+    div.appendChild(h3);
+    const optionsDiv=document.createElement("div"); optionsDiv.className="options";
+    q.options.forEach((opt,i)=>{
+      const span=document.createElement("span"); span.className="option"; span.textContent=opt;
+      span.dataset.index=i; span.addEventListener("click",()=>selectOption(span,index));
+      optionsDiv.appendChild(span);
+    });
+    div.appendChild(optionsDiv); testQuestionsDiv.appendChild(div);
   });
 }
 
-// ======== RANDOM 50 QUESTIONS ========
-function getRandomQuestions(arr,num){
-  const shuffled = [...arr].sort(()=>0.5-Math.random());
-  return shuffled.slice(0,num);
-}
+function getRandomQuestions(arr,num){ return [...arr].sort(()=>0.5-Math.random()).slice(0,num); }
 
-// ======== SELECT OPTION IN TEST ========
 function selectOption(el,qIndex){
-  const options = el.parentNode.querySelectorAll(".option");
+  const options=el.parentNode.querySelectorAll(".option");
   options.forEach(o=>o.classList.remove("selected"));
   el.classList.add("selected");
-  userAnswers[qIndex] = parseInt(el.dataset.index);
+  userAnswers[qIndex]=parseInt(el.dataset.index);
 }
 
-// ======== SUBMIT TEST ========
 submitTestBtn.addEventListener("click",()=>{
   let score=0;
   currentTest.forEach((q,i)=>{
-    const options = testQuestionsDiv.children[i].querySelectorAll(".option");
-    if(userAnswers[i]===q.correct) {
-      score++;
-      options[q.correct].classList.add("correct"); // green
-    } else {
-      if(userAnswers[i]!=null) options[userAnswers[i]].classList.add("wrong"); // red
-      options[q.correct].classList.add("correct"); // green
-    }
+    const options=testQuestionsDiv.children[i].querySelectorAll(".option");
+    if(userAnswers[i]===q.correct){ score++; options[q.correct].classList.add("correct"); }
+    else{ if(userAnswers[i]!=null) options[userAnswers[i]].classList.add("wrong"); options[q.correct].classList.add("correct"); }
   });
-  testResult.innerHTML=`You scored <strong>${score}/50</strong>`;
+  testResult.innerHTML=`You scored <strong>${score}/${currentTest.length}</strong>`;
   submitTestBtn.classList.add("hidden");
 });
 
 // ======== INITIAL LOAD ========
 loadQuestions();
+
+
+
+ 
